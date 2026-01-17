@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { Portfolio, MarketData, TradeLogEntry } from '../types';
-
-const SOCKET_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
+// 👇 CRITICAL IMPORT: This makes it work on Render automatically
+import { API_BASE_URL } from '../services/api'; 
 
 export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -19,16 +19,17 @@ export const useSocket = () => {
   const [botState, setBotState] = useState<{ isTrading: boolean; mode: 'PAPER' | 'LIVE' } | null>(null);
 
   useEffect(() => {
-    const socketInstance = io(SOCKET_URL, {
-      transports: ['polling', 'websocket'],
+    // 👇 UPDATED: Uses the dynamic API URL instead of hardcoded localhost
+    const socketInstance = io(API_BASE_URL, {
+      transports: ['polling', 'websocket'], // Try both methods
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       upgrade: true,
     });
 
     socketInstance.on('connect', () => {
-      console.log('✅ Connected to trading server');
+      console.log('✅ Connected to trading server at', API_BASE_URL);
       setIsConnected(true);
     });
 
