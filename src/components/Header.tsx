@@ -1,6 +1,8 @@
 import React from 'react';
 import { Wifi, WifiOff } from 'lucide-react';
 import { useSocket } from '../hooks/useSocket';
+// ✅ IMPORT THE BACKEND URL
+import { API_BASE_URL } from '../services/api';
 
 export const Header: React.FC = () => {
   const { isConnected, botState, setBotState } = useSocket();
@@ -20,9 +22,11 @@ export const Header: React.FC = () => {
     const newState = !botState.isTrading;
 
     try {
-      console.log(`🚀 [FETCH] POST /api/status with { active: ${newState} }`);
+      // ✅ FIX: Use API_BASE_URL
+      const url = `${API_BASE_URL}/api/status`;
+      console.log(`🚀 [FETCH] POST ${url} with { active: ${newState} }`);
       
-      const res = await fetch('/api/status', { 
+      const res = await fetch(url, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ active: newState }) 
@@ -49,7 +53,8 @@ export const Header: React.FC = () => {
     const newMode = botState.mode === 'PAPER' ? 'LIVE' : 'PAPER';
 
     try {
-      const res = await fetch('/api/mode', { 
+      // ✅ FIX: Use API_BASE_URL
+      const res = await fetch(`${API_BASE_URL}/api/mode`, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ mode: newMode }) 
@@ -120,4 +125,4 @@ export const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default Header; 

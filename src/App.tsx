@@ -6,53 +6,25 @@ import { PortfolioCard } from './components/PortfolioCard';
 import { LiveChart } from './components/LiveChart';
 import { ActivePositions } from './components/ActivePositions';
 import { TradeLog } from './components/TradeLog';
+// ✅ IMPORT API URL
+import { API_BASE_URL } from './services/api';
 
 function App() {
   const { isConnected, portfolio, marketData, tradeLogs } = useSocket();
   const [botState, setBotState] = React.useState<{ isTradingActive: boolean; tradingMode: 'PAPER' | 'LIVE' } | null>(null);
 
   React.useEffect(() => {
-    // Fetch current bot state
-    fetch('/api/status').then(r => r.json()).then(s => setBotState(s)).catch(() => null);
+    // ✅ FIX: Use API_BASE_URL for initial fetch
+    fetch(`${API_BASE_URL}/api/status`)
+      .then(r => r.json())
+      .then(s => setBotState(s))
+      .catch(() => null);
   }, []);
-
-  const toggleStatus = async () => {
-    const res = await fetch('/api/toggle-status', { method: 'POST' });
-    if (res.ok) setBotState(await res.json());
-  };
-
-  const toggleMode = async () => {
-    const res = await fetch('/api/toggle-mode', { method: 'POST' });
-    if (res.ok) setBotState(await res.json());
-    else {
-      const err = await res.json().catch(() => ({ error: 'Failed' }));
-      alert('Could not switch mode: ' + (err.error || JSON.stringify(err)));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-dark-bg text-white">
       {/* Header */}
-      <header className="border-b border-dark-border bg-dark-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  AI Solana Paper Trading Bot
-                </h1>
-                <p className="text-sm text-gray-400">Real-time AI-powered trading simulation</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Header />
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -72,7 +44,6 @@ function App() {
                 <Activity className="w-5 h-5 text-blue-400" />
               </div>
 
-              {/* 👇 UPDATED CONTAINER: Fixed height + Scroll + Padding */}
               <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
                 {marketData.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
